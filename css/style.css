@@ -1629,7 +1629,6 @@ html::before {
 @media (max-width: 900px) { html::before { height: 76px; } }
 @media print { html::before { display: none; } }
 
-/* Sembunyikan tombol play bawaan iOS/Safari di video hero */
 .hv::-webkit-media-controls,
 .hv::-webkit-media-controls-panel,
 .hv::-webkit-media-controls-start-playback-button,
