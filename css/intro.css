@@ -1,0 +1,42 @@
+html.intro-on, html.intro-on body { overflow: hidden; }
+html.intro-on .rv span, html.intro-on .fade { animation: none !important; }
+html.intro-on .rv span { transform: translateY(110%); }
+html.intro-on .fade { opacity: 0; }
+
+#intro { position: fixed; inset: 0; z-index: 1000; pointer-events: auto; cursor: pointer; overflow: hidden;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
+#intro .panel { will-change: transform; backface-visibility: hidden;
+  position: absolute; top: 0; bottom: 0; left: -25%; width: 150%;
+  background: #F4F9FF; transform-origin: 100% 100%; transform: skewX(-3deg) scaleX(0);
+}
+#intro .p1 {
+  z-index: 3; background-color: #F4F9FF;
+  background-image:
+    linear-gradient(rgba(47,140,255,.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47,140,255,.10) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+#intro .p2 { z-index: 2; background: #A9D0FA; }
+#intro .p3 { z-index: 1; background: #74B8FF; }
+
+#intro .house { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; overflow: visible; }
+#intro .house path {
+  fill: none; stroke: #1F78EA; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+#intro .house .dim { stroke: #5AA9FF; stroke-width: 2; }
+#intro .house .crane, #intro .house .scaf { stroke: #5AA9FF; stroke-width: 2; }
+#intro .house path.in { fill: url(#fsGlow); stroke: none; }
+#intro .house path.room { stroke: #1F78EA; stroke-width: 1.5; stroke-opacity: 0; }
+#intro .house path.leaf { fill: #CFE3FB; fill-opacity: 0; }
+#intro .house path.leafd { stroke: #1F78EA; stroke-width: 2; }
+
+@media (prefers-reduced-motion: reduce) { #intro { display: none; } }
+
+#intro { will-change: opacity; }
+#intro .house { will-change: transform; shape-rendering: geometricPrecision; }
+html.intro-on body::before {
+  content: ""; position: fixed; inset: 0; z-index: 999; background: #F4F9FF;
+  animation: fsCoverOut .01s linear 10s forwards;
+}
+@keyframes fsCoverOut { to { opacity: 0; visibility: hidden; } }

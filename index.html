@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1273EA">
+  <title>FREESPACE BUILDING — PT FREESPACE</title>
+
+  <script>
+    (function () {
+      try {
+        var r = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var home = /^#?\/?$/.test(location.hash);
+        var seen = sessionStorage.getItem('fs-intro') === '1';
+        if (!r && home && !seen) document.documentElement.className += ' intro-on';
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/intro.css">
+  <noscript><style>html.intro-on,html.intro-on body{overflow:auto}</style></noscript>
+</head>
+
+<body>
+  <div id="pg"></div>
+
+  <nav id="nav">
+    <a href="#/" class="logo">FREE<b>SPACE</b> BUILDING</a>
+    <div class="menu" id="menu"></div>
+    <div style="display:flex;gap:8px">
+      <button class="ic" id="th" aria-label="Ganti tema">◐</button>
+      <button class="ic" id="ham" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <main id="app"></main>
+
+  <footer>
+    <div class="w two" style="grid-template-columns:2fr 1fr 1fr">
+      <div>
+        <h4>Freespace Building</h4>
+        PT FREESPACE
+        <p style="margin-top:12px">
+          Studio &amp; Gallery:<br>
+          Jl. Jakarta No. 42, Antapani, Kota Bandung, Jawa Barat 40291
+        </p>
+        <p style="margin-top:8px">
+          WhatsApp:
+          <a style="display:inline;color:#fff;font-weight:700;text-decoration:underline"
+             href="https://wa.me/6285723405913?text=Halo%20Freespace%20Building%2C%20saya%20ingin%20berkonsultasi."
+             target="_blank" rel="noopener">+62 857-2340-5913</a><br>
+          Email:
+          <a style="display:inline" href="mailto:khiarajatinusantara@gmail.com">khiarajatinusantara@gmail.com</a>
+        </p>
+      </div>
+
+      <div>
+        <h4>Menu</h4>
+        <a href="#/reservasi">Reservasi</a>
+        <a href="#/booking">Cek Booking</a>
+        <a href="#/portfolio">Portofolio</a>
+        <a href="#/artikel">Artikel</a>
+        <a href="#/customer-journey">Customer Journey</a>
+        <a href="#/faq">FAQ</a>
+      </div>
+
+      <div>
+        <h4>Hitungan</h4>
+        <a href="#/kalkulator">Kalkulator</a>
+        <a href="#/simulasi">Simulasi</a>
+        <a href="#/konsultasi">Konsultasi</a>
+        <a href="#/pricelist">Pricelist</a>
+        <a href="#/layanan">Paket Layanan</a>
+        <a href="#/kerjasama">Kerjasama</a>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:30px;font-size:.8rem;opacity:.6">© 2026 PT FREESPACE BUILDING</p>
+  </footer>
+  <button class="btn" id="top" aria-label="Kembali ke atas">↑</button>
+  <div id="toast" role="status"></div>
+
+  <script src="js/qrcode.js"></script>
+  <script src="js/galery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/sim3d.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/intro.js"></script>
+</body>
+</html>
