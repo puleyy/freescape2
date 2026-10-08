@@ -1270,28 +1270,50 @@ const IM = (i, src) => `
           // (mis. Mode Daya Rendah iPhone / browser dalam aplikasi WhatsApp)
           hv.classList.add('on');
           hv.setAttribute('webkit-playsinline', '');
-          const tryPlay = () => { const p = hv.play(); if (p && p.catch) p.catch(() => {}); };
+          // cadangan: jika video diblokir (Mode Daya Rendah iPhone), langsung tampilkan animasi WebP
+          // yang tetap berjalan otomatis; dihapus begitu video asli mulai terputar
+          let fbImg = null;
+          const showFallback = () => {
+            if (fbImg) return;
+            fbImg = new Image();
+            fbImg.alt = ''; fbImg.className = 'hv on';
+            fbImg.setAttribute('aria-hidden', 'true');
+            fbImg.style.background = 'url(images/hero-poster.jpg) center / cover'; // poster tampil selama animasi dimuat
+            const img = fbImg;
+            img.onload = () => { if (fbImg === img) hv.style.visibility = 'hidden'; }; // sembunyikan tombol play bawaan iOS
+            fbImg.src = 'video/hero-fallback.webp';
+            hv.insertAdjacentElement('afterend', fbImg);
+          };
+          hv.addEventListener('playing', () => {
+            hv.style.visibility = '';
+            if (fbImg) { fbImg.remove(); fbImg = null; }
+          });
+          const tryPlay = () => {
+            const p = hv.play();
+            if (p && p.catch) p.catch(() => showFallback());
+          };
           tryPlay();
+          setTimeout(() => { if (hv.paused) showFallback(); }, 500);
           // jika diblokir, putar saat sentuhan/klik pertama
           const unlock = () => { if (hv.paused) tryPlay(); };
           ['touchend', 'pointerup', 'click'].forEach(ev => window.addEventListener(ev, unlock, { passive: true }));
           hv.addEventListener('playing', () => {
             ['touchend', 'pointerup', 'click'].forEach(ev => window.removeEventListener(ev, unlock));
           }, { once: true });
-          let fading = false;
-          hv.addEventListener('timeupdate', () => {
-            const d = hv.duration;
-            if (!d || fading) return;
-            if (d - hv.currentTime < 0.9) {
-              fading = true; hv.classList.remove('on');
-              setTimeout(() => { hv.currentTime = 0; const q = hv.play(); if (q && q.catch) q.catch(() => {});
-                setTimeout(() => { hv.classList.add('on'); fading = false; }, 150); }, 900);
-            }
-          });
-          document.addEventListener('visibilitychange', () => {
-            if (!document.body.contains(hv)) return;
-            if (document.hidden) hv.pause(); else { const q = hv.play(); if (q && q.catch) q.catch(() => {}); }
-          });
+          // putar terus tanpa jeda: loop bawaan (tanpa fade/reset), dan otomatis diputar lagi
+          // bila berhenti karena sebab apa pun (hemat daya, scroll, interupsi sistem)
+          const resume = () => {
+            if (!document.body.contains(hv) || document.hidden) return;
+            if (hv.paused || hv.ended) { if (hv.ended) hv.currentTime = 0; tryPlay(); }
+          };
+          ['pause', 'ended', 'stalled', 'suspend', 'waiting'].forEach(ev => hv.addEventListener(ev, () => setTimeout(resume, 120)));
+          document.addEventListener('visibilitychange', resume);
+          window.addEventListener('pageshow', resume);
+          window.addEventListener('focus', resume);
+          const watch = setInterval(() => {
+            if (!document.body.contains(hv)) { clearInterval(watch); return; }
+            resume();
+          }, 1200);
         }
       }
 

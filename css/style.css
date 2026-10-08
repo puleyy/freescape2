@@ -1628,3 +1628,14 @@ html::before {
 @media (max-width: 1100px) { html::before { height: 70px; } }
 @media (max-width: 900px) { html::before { height: 76px; } }
 @media print { html::before { display: none; } }
+
+/* Sembunyikan tombol play bawaan iOS/Safari di video hero */
+.hv::-webkit-media-controls,
+.hv::-webkit-media-controls-panel,
+.hv::-webkit-media-controls-start-playback-button,
+.hv::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  -webkit-appearance: none;
+  opacity: 0;
+  pointer-events: none;
+}
