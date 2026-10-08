@@ -1266,10 +1266,18 @@ const IM = (i, src) => `
         const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (reduce) { hv.removeAttribute('autoplay'); hv.pause(); hv.classList.add('on'); }
         else {
-          const show = () => hv.classList.add('on');
-          if (hv.readyState >= 3) show(); else hv.addEventListener('canplay', show, { once: true });
-          const p = hv.play(); if (p && p.catch) p.catch(() => {});
-          // transisi halus di titik pengulangan: memudar keluar lalu masuk kembali
+          // tampilkan langsung (poster ikut terlihat) agar tidak gelap walau autoplay diblokir
+          // (mis. Mode Daya Rendah iPhone / browser dalam aplikasi WhatsApp)
+          hv.classList.add('on');
+          hv.setAttribute('webkit-playsinline', '');
+          const tryPlay = () => { const p = hv.play(); if (p && p.catch) p.catch(() => {}); };
+          tryPlay();
+          // jika diblokir, putar saat sentuhan/klik pertama
+          const unlock = () => { if (hv.paused) tryPlay(); };
+          ['touchend', 'pointerup', 'click'].forEach(ev => window.addEventListener(ev, unlock, { passive: true }));
+          hv.addEventListener('playing', () => {
+            ['touchend', 'pointerup', 'click'].forEach(ev => window.removeEventListener(ev, unlock));
+          }, { once: true });
           let fading = false;
           hv.addEventListener('timeupdate', () => {
             const d = hv.duration;
