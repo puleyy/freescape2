@@ -240,7 +240,7 @@ const IM = (i, src) => `
     const R = {
       '': () => `
         <div class="hero home" id="hero">
-          <video class="hv" id="hv" muted playsinline autoplay loop preload="auto"
+          <video class="hv" id="hv" muted playsinline autoplay loop preload="auto" disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"
                  poster="images/hero-poster.jpg" aria-hidden="true" tabindex="-1">
             <source src="video/hero.mp4" type="video/mp4">
             <source src="video/hero.webm" type="video/webm">
@@ -1634,6 +1634,23 @@ const IM = (i, src) => `
             <div class="card" id="jc" style="min-height:220px"></div>
             <div class="card jph" id="jph"></div>
           </div>
+          <div class="jcta" id="jcta">
+            <button type="button" class="jcta-ic" id="jctaIc" aria-label="Chat tim Freespace lewat WhatsApp">💬</button>
+            <div class="jcta-body">
+              <div class="jcta-msg" id="jctaMsg" aria-live="polite">
+                <h3>Masih ragu atau bingung mulai dari mana?</h3>
+                <p>Wajar kok, membangun itu keputusan besar. Yuk ngobrol santai dulu dengan tim kami, nanti kami bantu arahkan langkah yang paling pas.</p>
+              </div>
+              <div class="jcta-foot">
+                <div class="jcta-dots" id="jctaDots">
+                  <button type="button" class="on" aria-label="Pesan 1"></button>
+                  <button type="button" aria-label="Pesan 2"></button>
+                  <button type="button" aria-label="Pesan 3"></button>
+                </div>
+              </div>
+            </div>
+            <i class="jcta-bar" id="jctaBar" aria-hidden="true"></i>
+          </div>
         </div>
       </section>`;
 
@@ -1652,8 +1669,10 @@ const IM = (i, src) => `
             <p style="font-weight:700;margin-bottom:6px">Yang Anda terima</p>
             ${j[3].map((o, k) => `<p style="margin:6px 0"><span class="ck" style="animation-delay:${k * 120}ms">✓</span>${o}</p>`).join('')}
           </div>
-          <button type="button" class="jar jl" id="jp" aria-label="Tahap sebelumnya" ${i == 0 ? 'disabled' : ''}>‹</button>
-          <button type="button" class="jar jr" id="jn" aria-label="Tahap berikutnya" ${i == JR.length - 1 ? 'disabled' : ''}>›</button>`;
+          <div class="jnav">
+            <button type="button" class="jar" id="jp" aria-label="Tahap sebelumnya" ${i == 0 ? 'disabled' : ''}>‹</button>
+            <button type="button" class="jar" id="jn" aria-label="Tahap berikutnya" ${i == JR.length - 1 ? 'disabled' : ''}>›</button>
+          </div>`;
         const foto = (GALERY.proses && GALERY.proses[i]) || GALERY.placeholder;
         $('#jph').innerHTML = `
           <div class="jimg">
@@ -1665,6 +1684,54 @@ const IM = (i, src) => `
       };
       $$('.dot').forEach((d, i) => d.onclick = () => select(i));
       select(0);
+
+      // kartu ajakan di bawah: pesan bergantian, jeda saat disentuh/disorot
+      const CT = [
+        ['Masih ragu atau bingung mulai dari mana?', 'Wajar kok, membangun itu keputusan besar. Yuk ngobrol santai dulu dengan tim kami, nanti kami bantu arahkan langkah yang paling pas.', 'Halo Freespace Building, saya masih bingung mulai dari mana dan ingin berkonsultasi.'],
+        ['Sudah tidak ragu lagi? Langsung hubungi kami!', 'Ceritakan rencana Anda, tim kami siap membantu mewujudkannya dari tahap pertama sampai kunci di tangan.', 'Halo Freespace Building, saya sudah mantap dan ingin membahas rencana pembangunan saya.'],
+        ['Masih bingung? Mending chat tim kami dulu.', 'Konsultasi lebih lanjut bersama tim kami, supaya setiap keputusan terasa lebih mantap.', 'Halo Freespace Building, saya masih bingung dan ingin konsultasi lebih lanjut.']
+      ];
+      const box = $('#jcta'), msg = $('#jctaMsg'), bar = $('#jctaBar');
+      if (box) {
+        const dots = $$('#jctaDots button');
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let ci = 0, timer = null, swap = null;
+        const restartBar = () => { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; };
+        const show = i => {
+          ci = i;
+          dots.forEach((d, k) => d.classList.toggle('on', k == i));
+          clearTimeout(swap);
+          msg.classList.add('out');
+          swap = setTimeout(() => {
+            msg.querySelector('h3').textContent = CT[i][0];
+            msg.querySelector('p').textContent = CT[i][1];
+            msg.classList.remove('out');
+          }, reduce ? 0 : 260);
+          restartBar();
+        };
+        const stop = () => { clearInterval(timer); timer = null; box.classList.add('pause'); };
+        const go = () => {
+          if (reduce) return;
+          stop(); box.classList.remove('pause'); restartBar();
+          timer = setInterval(() => {
+            if (!document.body.contains(box)) { clearInterval(timer); return; }
+            show((ci + 1) % CT.length);
+          }, 6500);
+        };
+        dots.forEach((d, i) => d.onclick = e => { e.stopPropagation(); show(i); go(); });
+        // tekan ikon -> buka WhatsApp dengan pesan sesuai kalimat yang sedang tampil
+        const openWA = () => {
+          const url = WAURL + '?text=' + encodeURIComponent(CT[ci][2]);
+          box.classList.remove('go'); void box.offsetWidth; box.classList.add('go');
+          window.open(url, '_blank', 'noopener');
+          setTimeout(() => box.classList.remove('go'), 1800);
+        };
+        $('#jctaIc').addEventListener('click', openWA);
+        ['mouseenter', 'focusin', 'touchstart'].forEach(ev => box.addEventListener(ev, stop, { passive: true }));
+        ['mouseleave', 'focusout'].forEach(ev => box.addEventListener(ev, go));
+        box.addEventListener('touchend', () => setTimeout(go, 4000), { passive: true });
+        go();
+      }
     }
 
     const IP = {
