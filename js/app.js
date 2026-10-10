@@ -1272,28 +1272,54 @@ const IM = (i, src) => `
           hv.setAttribute('webkit-playsinline', '');
           // cadangan: jika video diblokir (Mode Daya Rendah iPhone), langsung tampilkan animasi WebP
           // yang tetap berjalan otomatis; dihapus begitu video asli mulai terputar
-          let fbImg = null;
+          let fbImg = null, fbRaf = 0;
           const showFallback = () => {
             if (fbImg) return;
-            fbImg = new Image();
-            fbImg.alt = ''; fbImg.className = 'hv on';
-            fbImg.setAttribute('aria-hidden', 'true');
-            fbImg.style.background = 'url(images/hero-poster.jpg) center / cover'; // poster tampil selama animasi dimuat
-            const img = fbImg;
-            img.onload = () => { if (fbImg === img) hv.style.visibility = 'hidden'; }; // sembunyikan tombol play bawaan iOS
-            fbImg.src = 'video/hero-fallback.webp';
-            hv.insertAdjacentElement('afterend', fbImg);
+            // Mode Daya Rendah iOS memblokir autoplay <video>, tetapi canvas yang digerakkan JS tetap jalan.
+            // Urutan 72 gambar JPEG (6 dtk, 12 fps) diputar maju-mundur agar mulus tanpa sentuhan.
+            const N = 72, FPS = 12;
+            const cv = document.createElement('canvas');
+            cv.className = 'hv on';
+            cv.setAttribute('aria-hidden', 'true');
+            cv.width = 720; cv.height = 400;
+            cv.style.background = 'url(images/hero-poster.jpg) center / cover';
+            const ctx = cv.getContext('2d');
+            fbImg = cv;
+            hv.insertAdjacentElement('afterend', cv);
+            hv.style.visibility = 'hidden'; // sembunyikan tombol play bawaan iOS
+            const frames = [];
+            let loaded = 0;
+            for (let i = 1; i <= N; i++) {
+              const im = new Image();
+              im.decoding = 'async';
+              im.onload = () => { frames[i - 1] = im; loaded++; };
+              im.src = 'video/frames/f' + String(i).padStart(2, '0') + '.jpg';
+            }
+            const t0 = performance.now();
+            const tick = now => {
+              if (fbImg !== cv) return;
+              if (loaded) {
+                const total = 2 * (N - 1);
+                let k = Math.floor((now - t0) / 1000 * FPS) % total;
+                if (k >= N) k = total - k;            // maju lalu mundur
+                let im = frames[k];
+                if (!im) { for (let j = k; j >= 0 && !im; j--) im = frames[j]; }
+                if (im) ctx.drawImage(im, 0, 0, cv.width, cv.height);
+              }
+              fbRaf = requestAnimationFrame(tick);
+            };
+            fbRaf = requestAnimationFrame(tick);
           };
           hv.addEventListener('playing', () => {
             hv.style.visibility = '';
-            if (fbImg) { fbImg.remove(); fbImg = null; }
+            if (fbImg) { cancelAnimationFrame(fbRaf); fbImg.remove(); fbImg = null; }
           });
           const tryPlay = () => {
             const p = hv.play();
             if (p && p.catch) p.catch(() => showFallback());
           };
           tryPlay();
-          setTimeout(() => { if (hv.paused) showFallback(); }, 500);
+          setTimeout(() => { if (hv.paused) showFallback(); }, 300);
           // jika diblokir, putar saat sentuhan/klik pertama
           const unlock = () => { if (hv.paused) tryPlay(); };
           ['touchend', 'pointerup', 'click'].forEach(ev => window.addEventListener(ev, unlock, { passive: true }));
