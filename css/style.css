@@ -1715,3 +1715,14 @@ button.jcta-ic:focus-visible { outline: 3px solid rgba(47, 140, 255, .6); outlin
   .jcta-foot { flex-wrap: wrap; row-gap: 6px; }
   }
 @media (prefers-reduced-motion: reduce) { .jcta.go .jcta-ic { animation: none; } }
+
+.sim-svg { position: relative; }
+.sim-tools { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; z-index: 2; }
+.sim-tools button { white-space: nowrap; min-height: 32px; padding: 0 12px; border: 1px solid rgba(255, 255, 255, .7); border-radius: 99px; background: rgba(18, 115, 234, .88); color: #fff; font-size: .74rem; font-weight: 700; cursor: pointer; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); box-shadow: 0 4px 14px rgba(8, 48, 110, .3); transition: transform .15s, background .2s; }
+.sim-tools button:hover { background: #1273EA; }
+.sim-tools button:active { transform: scale(.94); }
+@media (max-width: 700px) {
+  .sim-tools { top: 6px; right: 6px; gap: 4px; }
+  .sim-tools button { min-height: 26px; padding: 0 9px; font-size: .62rem; }
+  .sim-tools .lg { display: none; }
+}

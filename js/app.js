@@ -1266,17 +1266,14 @@ const IM = (i, src) => `
         const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (reduce) { hv.removeAttribute('autoplay'); hv.pause(); hv.classList.add('on'); }
         else {
-          // tampilkan langsung (poster ikut terlihat) agar tidak gelap walau autoplay diblokir
-          // (mis. Mode Daya Rendah iPhone / browser dalam aplikasi WhatsApp)
+
           hv.classList.add('on');
           hv.setAttribute('webkit-playsinline', '');
-          // cadangan: jika video diblokir (Mode Daya Rendah iPhone), langsung tampilkan animasi WebP
-          // yang tetap berjalan otomatis; dihapus begitu video asli mulai terputar
+
           let fbImg = null, fbRaf = 0;
           const showFallback = () => {
             if (fbImg) return;
-            // Mode Daya Rendah iOS memblokir autoplay <video>, tetapi canvas yang digerakkan JS tetap jalan.
-            // Urutan 72 gambar JPEG (6 dtk, 12 fps) diputar maju-mundur agar mulus tanpa sentuhan.
+           
             const N = 72, FPS = 12;
             const cv = document.createElement('canvas');
             cv.className = 'hv on';
@@ -1286,7 +1283,7 @@ const IM = (i, src) => `
             const ctx = cv.getContext('2d');
             fbImg = cv;
             hv.insertAdjacentElement('afterend', cv);
-            hv.style.visibility = 'hidden'; // sembunyikan tombol play bawaan iOS
+            hv.style.visibility = 'hidden'; 
             const frames = [];
             let loaded = 0;
             for (let i = 1; i <= N; i++) {
@@ -1301,7 +1298,7 @@ const IM = (i, src) => `
               if (loaded) {
                 const total = 2 * (N - 1);
                 let k = Math.floor((now - t0) / 1000 * FPS) % total;
-                if (k >= N) k = total - k;            // maju lalu mundur
+                if (k >= N) k = total - k;           
                 let im = frames[k];
                 if (!im) { for (let j = k; j >= 0 && !im; j--) im = frames[j]; }
                 if (im) ctx.drawImage(im, 0, 0, cv.width, cv.height);
@@ -1320,14 +1317,13 @@ const IM = (i, src) => `
           };
           tryPlay();
           setTimeout(() => { if (hv.paused) showFallback(); }, 300);
-          // jika diblokir, putar saat sentuhan/klik pertama
+  
           const unlock = () => { if (hv.paused) tryPlay(); };
           ['touchend', 'pointerup', 'click'].forEach(ev => window.addEventListener(ev, unlock, { passive: true }));
           hv.addEventListener('playing', () => {
             ['touchend', 'pointerup', 'click'].forEach(ev => window.removeEventListener(ev, unlock));
           }, { once: true });
-          // putar terus tanpa jeda: loop bawaan (tanpa fade/reset), dan otomatis diputar lagi
-          // bila berhenti karena sebab apa pun (hemat daya, scroll, interupsi sistem)
+          
           const resume = () => {
             if (!document.body.contains(hv) || document.hidden) return;
             if (hv.paused || hv.ended) { if (hv.ended) hv.currentTime = 0; tryPlay(); }
@@ -1418,13 +1414,12 @@ const IM = (i, src) => `
       subPanel.style.left = left + 'px';
       subPanel.style.setProperty('--ax', ax + 'px');
       subPanel.style.setProperty('--ox', ax + 'px');
-      void subPanel.offsetWidth;            // restart animasi
+      void subPanel.offsetWidth; 
       subPanel.classList.add('o');
       subOpen = key;
       a.setAttribute('aria-expanded', 'true');
     }
 
-    // sorotan cahaya mengikuti kursor di dalam dropdown
     subPanel.addEventListener('mousemove', e => {
       const it = e.target.closest('a');
       if (!it) return;
@@ -1433,7 +1428,6 @@ const IM = (i, src) => `
       it.style.setProperty('--my', e.clientY - r.top + 'px');
     });
 
-    // saat satu dropdown terbuka, hover menu lain langsung berpindah
     $('#menu').addEventListener('mouseover', e => {
       const a = e.target.closest('.has-sub');
       if (a && subOpen && subOpen != a.dataset.sub) { closeSub(); openSub(a); }
@@ -1711,7 +1705,6 @@ const IM = (i, src) => `
       $$('.dot').forEach((d, i) => d.onclick = () => select(i));
       select(0);
 
-      // kartu ajakan di bawah: pesan bergantian, jeda saat disentuh/disorot
       const CT = [
         ['Masih ragu atau bingung mulai dari mana?', 'Wajar kok, membangun itu keputusan besar. Yuk ngobrol santai dulu dengan tim kami, nanti kami bantu arahkan langkah yang paling pas.', 'Halo Freespace Building, saya masih bingung mulai dari mana dan ingin berkonsultasi.'],
         ['Sudah tidak ragu lagi? Langsung hubungi kami!', 'Ceritakan rencana Anda, tim kami siap membantu mewujudkannya dari tahap pertama sampai kunci di tangan.', 'Halo Freespace Building, saya sudah mantap dan ingin membahas rencana pembangunan saya.'],
@@ -1745,7 +1738,6 @@ const IM = (i, src) => `
           }, 6500);
         };
         dots.forEach((d, i) => d.onclick = e => { e.stopPropagation(); show(i); go(); });
-        // tekan ikon -> buka WhatsApp dengan pesan sesuai kalimat yang sedang tampil
         const openWA = () => {
           const url = WAURL + '?text=' + encodeURIComponent(CT[ci][2]);
           box.classList.remove('go'); void box.offsetWidth; box.classList.add('go');
@@ -1795,7 +1787,7 @@ const IM = (i, src) => `
         `<ellipse cx="${x - 10 * k}" cy="${214 - 14 * k}" rx="${9 * k}" ry="${16 * k}" fill="#4FA362"/>` +
         `<ellipse cx="${x + 10 * k}" cy="${214 - 14 * k}" rx="${9 * k}" ry="${16 * k}" fill="#2F7141"/>`;
 
-      const ar = +s.area || 16, k = 1.1 - (ar - 6) / 54 * 0.32, cx0 = 200, cy0 = 230;
+      const ar = (+s.lebar * +s.panjang) || 16, k = 1.1 - (ar - 6) / 54 * 0.32, cx0 = 200, cy0 = 230;
       f += `<g transform="translate(${cx0} ${cy0}) scale(${k.toFixed(3)}) translate(${-cx0} ${-cy0})">`;
       let lamp = [300, 150];
       if (r == 'Living Room') {
@@ -1988,14 +1980,20 @@ const IM = (i, src) => `
           { id: 'room', l: 'Tipe ruangan', o: ['Kamar Tidur', 'Living Room', 'Master Suite', 'Kamar Kos'] },
           { id: 'style', l: 'Gaya', o: ['Japandi Zen', 'Tropis Modern', 'Minimalist', 'Industrial'] },
           { id: 'light', l: 'Pencahayaan', o: ['Warm 3000K', 'Natural 4000K', 'Moody 2700K'] },
-          { id: 'area', l: 'Luas ruangan', r: [6, 60, 1], u: ' m²', v: 16 }
+          { id: 'lebar', l: 'Lebar ruangan', r: [3, 8, .5], u: ' m', v: 4 },
+          { id: 'panjang', l: 'Panjang ruangan', r: [3, 10, .5], u: ' m', v: 4 },
+          { id: 'luas', l: 'Luas ruangan', r: [9, 80, .25], u: ' m\u00b2', v: 16 }
         ],
+        A: { w: 'lebar', d: 'panjang', wr: [3, 8, .5], dr: [3, 10, .5] },
         svg: roomSVG,
-        sum: s => ({
-          label: 'Desain 3D Interior', total: s.area * PX.interior,
-          rows: [['Ruangan', s.room], ['Gaya', s.style], ['Pencahayaan', s.light], ['Tarif', rp(PX.interior) + '/m²']],
-          cta: '#/reservasi?s=desain-3d-interior'
-        })
+        sum: s => {
+          const ar = s.lebar * s.panjang, id = n => String(n).replace('.', ',');
+          return {
+            label: 'Desain 3D Interior', total: ar * PX.interior,
+            rows: [['Ruangan', s.room], ['Gaya', s.style], ['Pencahayaan', s.light], ['Ukuran', `${id(s.lebar)} × ${id(s.panjang)} m`], ['Luas', `${id(ar)} m²`], ['Tarif', rp(PX.interior) + '/m²'], ...(window.SIM3D && SIM3D.summary ? SIM3D.summary(s) : [])],
+            cta: '#/reservasi?s=desain-3d-interior'
+          };
+        }
       },
       kitchen: {
         t: 'Kitchen Set', vb: '0 0 400 300',
@@ -2003,14 +2001,17 @@ const IM = (i, src) => `
           { id: 'layout', l: 'Layout', o: ['Linear', 'L-Shape', 'U-Shape', 'Island'] },
           { id: 'cab', l: 'Warna kabinet', o: ['Putih Glossy', 'Sage Green', 'Navy Blue', 'Walnut Wood'] },
           { id: 'top', l: 'Countertop', o: ['Granit Hitam', 'Marmer Putih', 'Solid Surface', 'Kayu Butcher'] },
-          { id: 'len', l: 'Panjang total', r: [2, 10, .5], u: ' m lari', v: 4 }
+          { id: 'len', l: 'Panjang total', r: [2, 10, .5], u: ' m lari', v: 4 },
+          { id: 'lebar', l: 'Lebar dapur', r: [3, 6, .5], u: ' m', v: 3.5 },
+          { id: 'luas', l: 'Luas dapur', r: [6, 60, .25], u: ' m\u00b2', v: 14 }
         ],
+        A: { w: 'len', d: 'lebar', wr: [2, 10, .5], dr: [3, 6, .5] },
         svg: kitchenSVG,
         sum: s => {
           const rate = PX.kitchen + KADD.layout[s.layout] + KADD.cab[s.cab] + KADD.top[s.top];
           return {
             label: 'Kitchen Set (indikatif)', total: rate * s.len,
-            rows: [['Layout', s.layout], ['Kabinet', s.cab], ['Countertop', s.top], ['Tarif', rp(rate) + '/m lari']],
+            rows: [['Layout', s.layout], ['Kabinet', s.cab], ['Countertop', s.top], ['Ukuran', `${String(s.len).replace('.', ',')} m lari × ${String(s.lebar).replace('.', ',')} m`], ['Luas', `${String(+(s.len * s.lebar).toFixed(2)).replace('.', ',')} m²`], ['Tarif', rp(rate) + '/m lari'], ...(window.SIM3D && SIM3D.summary ? SIM3D.summary(s) : [])],
             cta: '#/reservasi?s=desain-3d-interior'
           };
         }
@@ -2023,14 +2024,17 @@ const IM = (i, src) => `
           { id: 'wall', l: 'Warna dinding', o: ['Putih', 'Abu-abu', 'Krem', 'Hitam Matte'] },
           { id: 'acc', l: 'Material aksen', o: ['Kayu', 'Batu Alam', 'Secondary Skin', 'Beton Ekspos'] },
           { id: 'roof', l: 'Bentuk atap', o: ['Dak Datar', 'Pelana', 'Perisai'] },
-          { id: 'w', l: 'Lebar fasad', r: [6, 20, 1], u: ' m', v: 10 }
+          { id: 'w', l: 'Lebar bangunan', r: [6, 20, 1], u: ' m', v: 10 },
+          { id: 'd', l: 'Panjang bangunan', r: [6, 20, 1], u: ' m', v: 12 },
+          { id: 'luas', l: 'Luas bangunan', r: [36, 400, 1], u: ' m\u00b2', v: 120 }
         ],
+        A: { w: 'w', d: 'd', wr: [6, 20, 1], dr: [6, 20, 1] },
         svg: s => facadeSVG({ style: s.style, floors: parseInt(s.floors), wall: FW[s.wall], acc: FA[s.acc], accName: s.acc, roof: s.roof, w: s.w }, 'sim'),
         sum: s => {
           const fl = parseInt(s.floors), area = Math.round(s.w * fl * 3.5);
           return {
             label: 'Desain 3D Facade (indikatif)', total: area * PX.facade,
-            rows: [['Gaya', s.style], ['Lantai & atap', `${fl} lantai · ${s.roof}`], ['Material', `${s.wall} + ${s.acc}`], ['Luas fasad', `±${area} m² × ${rp(PX.facade)}`]],
+            rows: [['Gaya', s.style], ['Lantai & atap', `${fl} lantai · ${s.roof}`], ['Material', `${s.wall} + ${s.acc}`], ['Ukuran', `${s.w} × ${s.d} m`], ['Luas lantai', `${s.w * s.d} m² × ${fl} lt`], ['Luas fasad', `±${area} m² × ${rp(PX.facade)}`], ...(window.SIM3D && SIM3D.summary ? SIM3D.summary(s) : [])],
             cta: '#/reservasi?s=desain-3d-bangunan'
           };
         },
@@ -2067,8 +2071,12 @@ const IM = (i, src) => `
 
       const view = () => {
         const k = cur, sim = SIMS[k], s = SS[k];
-        const ok3d = window.SIM3D && SIM3D.show(k, s, $('#sims'), { IP, IL, KC, KT, FW, FA, FROOF });
+        const ok3d = window.SIM3D && SIM3D.show(k, s, $('#sims'), { IP, IL, KC, KT, FW, FA, FROOF }, () => { if (SIMS[k].A) s.luas = areaOf(k, s); controls(); res(); });
         if (!ok3d) $('#sims').innerHTML = `<svg viewBox="${sim.vb}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pratinjau ${sim.t}">${sim.svg(s)}</svg>`;
+        res();
+      };
+      const res = () => {
+        const k = cur, sim = SIMS[k], s = SS[k];
         const m = sim.sum(s);
         const wa = `${WAURL}?text=${encodeURIComponent(`Halo Freespace Building, saya sudah mencoba Simulasi ${sim.t}.\n` + m.rows.map(r => `• ${r[0]}: ${r[1]}`).join('\n') + `\nEstimasi: ${rp(m.total)}\nMohon info lebih lanjut.`)}`;
         $('#simr').innerHTML = `
@@ -2096,12 +2104,31 @@ const IM = (i, src) => `
           : `<p class="qh">${f.l}</p>${opts('sim_' + f.id, f.o, s[f.id], 'radio')}`).join('');
       };
 
+      const areaOf = (k, s) => { const A = SIMS[k].A; return +(s[A.w] * s[A.d]).toFixed(2); };
+      const snap = (v, r) => Math.max(r[0], Math.min(r[1], Math.round(v / r[2]) * r[2]));
+      const syncArea = (k, id) => {
+        const A = SIMS[k].A, q = SS[k], unit = SIMS[k].f.find(x => x.id == 'luas').u;
+        if (id == 'luas') {
+          const r = (q[A.w] / q[A.d]) || 1, D = Math.sqrt(q.luas / r);
+          q[A.d] = snap(D, A.dr); q[A.w] = snap(D * r, A.wr);
+          [A.w, A.d].forEach(x => {
+            const f = SIMS[k].f.find(y => y.id == x);
+            $('#r_' + x).value = q[x]; $('#v_' + x).textContent = q[x] + f.u;
+          });
+          $('#v_luas').textContent = areaOf(k, q) + unit;
+        } else {
+          q.luas = areaOf(k, q);
+          $('#r_luas').value = q.luas; $('#v_luas').textContent = q.luas + unit;
+        }
+      };
+
       const on = e => {
         const t = e.target;
         if (!t.name || t.name.slice(0, 4) != 'sim_') return;
         const id = t.name.slice(4), f = SIMS[cur].f.find(x => x.id == id);
         SS[cur][id] = f.r ? +t.value : t.value;
         if (f.r) $('#v_' + id).textContent = t.value + f.u;
+        if (SIMS[cur].A && (id == 'luas' || id == SIMS[cur].A.w || id == SIMS[cur].A.d)) syncArea(cur, id);
         if (SIMS[cur].change) { SIMS[cur].change(SS[cur], id); if (id == 'style') controls(); }
         view();
       };
