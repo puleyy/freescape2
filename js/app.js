@@ -2059,6 +2059,7 @@ const IM = (i, src) => `
             <div class="glass" id="simc"></div>
             <div>
               <div class="sim-svg" id="sims"></div>
+              <div id="simo"></div>
               <div class="res" id="simr"></div>
             </div>
           </div>

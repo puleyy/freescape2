@@ -1726,3 +1726,21 @@ button.jcta-ic:focus-visible { outline: 3px solid rgba(47, 140, 255, .6); outlin
   .sim-tools button { min-height: 26px; padding: 0 9px; font-size: .62rem; }
   .sim-tools .lg { display: none; }
 }
+
+
+@media (max-width: 700px) {
+  .two.simw { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; gap: 10px !important; align-items: stretch; }
+  .two.simw > div:last-child { display: contents; }
+  .simw #sims { grid-column: 1 / -1; grid-row: 1; width: 100%; }
+  .simw #simc { grid-column: 1; grid-row: 2; }
+  .simw #simo { grid-column: 2; grid-row: 2; min-width: 0; }
+  .simw #simr { grid-column: 1 / -1; grid-row: 3; margin-top: 4px; flex: none; justify-content: flex-start; }
+  .simw:has(#simo .sim-edit[style*="none"]) #simc { grid-column: 1 / -1; }
+  .simw #simo { position: relative; min-height: 360px; min-width: 0; }
+  .simw #simo .sim-edit { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; border: 1px solid var(--bd); border-radius: 12px; }
+  .simw #simo .sim-edit > .se-p { order: -1; }
+}
+
+#sims .sim-edit .se-add, #simo .sim-edit .se-add { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+#sims .sim-edit .se-grp, #simo .sim-edit .se-grp { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; width: 100%; }
+.sim-edit .se-grp em { width: 100%; font-style: normal; font-size: .6rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--mu, #4A6C99); }

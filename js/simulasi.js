@@ -613,12 +613,102 @@
         }
       }
     },
+    door: {
+      n: 'Pintu', w: 0.9, d: 0.12, c: '#B7A58F', min: 0.7, max: 1.6, nd: 1,
+      f: (g, w, d, c) => {
+        box(g, w, 2.05, 0.05, c, 0, 0, 0, { r: 0 });
+        [-1, 1].forEach(k => box(g, 0.06, 2.1, d, darken(c, 0.3), k * (w / 2), 0, 0, { r: 0 }));
+        box(g, w + 0.06, 0.06, d, darken(c, 0.3), 0, 2.05, 0, { r: 0 });
+        box(g, 0.03, 0.12, 0.05, '#B8BCC2', w / 2 - 0.12, 0.95, 0.04, { r: 0 });
+      }
+    },
+    window: {
+      n: 'Jendela', w: 1.2, d: 0.12, c: '#F1F1EF', min: 0.6, max: 3, nd: 1,
+      f: (g, w, d, c) => {
+        box(g, w, 1.1, 0.03, '#CFE4EE', 0, 0.9, 0, { r: 0, transparent: true, opacity: 0.45, roughness: 0.1 });
+        [0.9, 2.0].forEach(y => box(g, w, 0.06, d, c, 0, y, 0, { r: 0 }));
+        [-1, 1].forEach(k => box(g, 0.06, 1.16, d, c, k * (w / 2), 0.9, 0, { r: 0 }));
+        box(g, 0.04, 1.1, 0.05, c, 0, 0.9, 0, { r: 0 });
+      }
+    },
+    armchair: {
+      n: 'Kursi Santai', w: 0.85, d: 0.85, c: '#C96F4A',
+      f: (g, w, d, c) => {
+        box(g, w, 0.38, d, c, 0, 0.1, 0);
+        box(g, w, 0.5, 0.2, darken(c, 0.12), 0, 0.45, -d / 2 + 0.1);
+        [-1, 1].forEach(k => box(g, 0.16, 0.3, d, darken(c, 0.15), k * (w / 2 - 0.08), 0.4, 0));
+        addLegs(g, w * 0.9, d * 0.9, 0.1, '#3A3D42');
+      }
+    },
+    bookcase: {
+      n: 'Rak Buku', w: 1, d: 0.35, c: '#9C8670',
+      f: (g, w, d, c) => {
+        [-1, 1].forEach(k => box(g, 0.03, 1.9, d, c, k * (w / 2 - 0.015), 0, 0, { r: 0 }));
+        for (let i = 0; i <= 5; i++) box(g, w, 0.03, d, c, 0, i * 0.37, 0, { r: 0 });
+        box(g, w - 0.06, 1.9, 0.01, darken(c, 0.25), 0, 0, -d / 2 + 0.005, { r: 0 });
+      }
+    },
+    dresser: {
+      n: 'Meja Rias', w: 1.1, d: 0.45, c: '#E8DFD0',
+      f: (g, w, d, c) => {
+        addTable(g, w, d, c, 0.75);
+        box(g, 0.6, 0.7, 0.03, '#CFE4EE', 0, 1.0, -d / 2 + 0.03, { r: 0, metalness: 0.6, roughness: 0.1 });
+        box(g, w * 0.35, 0.2, d - 0.06, darken(c, 0.12), w * 0.28, 0.5, 0, { r: 0 });
+      }
+    },
+    island: {
+      n: 'Island Dapur', w: 1.8, d: 0.9, c: '#F4F5F7',
+      f: (g, w, d, c) => {
+        box(g, w, 0.85, d, c, 0, 0, 0);
+        box(g, w + 0.06, 0.04, d + 0.06, '#23262B', 0, 0.85, 0, { roughness: 0.25 });
+      }
+    },
+    stove: {
+      n: 'Kompor', w: 0.6, d: 0.6, c: '#2B2F36',
+      f: (g, w, d, c) => {
+        box(g, w, 0.85, d, '#C7CDD3', 0, 0, 0, { metalness: 0.6, roughness: 0.3 });
+        box(g, w, 0.02, d, c, 0, 0.85, 0, { r: 0, roughness: 0.15 });
+        [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(a => cyl(g, 0.07, 0.07, 0.01, '#4A4E54', a[0] * w * 0.22, 0.87, a[1] * d * 0.22));
+      }
+    },
+    round: {
+      n: 'Meja Bulat', w: 1, d: 1, c: '#E8DFD0', nd: 1,
+      f: (g, w, d, c) => {
+        cyl(g, w / 2, w / 2, 0.04, c, 0, 0.71, 0);
+        cyl(g, 0.05, 0.05, 0.71, darken(c, 0.3), 0, 0, 0);
+        cyl(g, 0.28, 0.28, 0.03, darken(c, 0.3), 0, 0, 0);
+      }
+    },
+    stool: {
+      n: 'Bangku', w: 0.4, d: 0.4, c: '#2B2F36', nd: 1,
+      f: (g, w, d, c) => {
+        cyl(g, w / 2, w / 2, 0.06, c, 0, 0.62, 0);
+        [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(a => cyl(g, 0.015, 0.015, 0.62, '#9AA0A6', a[0] * w * 0.28, 0, a[1] * w * 0.28));
+      }
+    },
+    bathtub: {
+      n: 'Bak Mandi', w: 1.7, d: 0.75, c: '#FFFFFF',
+      f: (g, w, d, c) => {
+        box(g, w, 0.55, d, c, 0, 0, 0);
+        box(g, w - 0.2, 0.02, d - 0.2, darken(c, 0.12), 0, 0.55, 0, { r: 0 });
+        cyl(g, 0.012, 0.012, 0.15, '#CDD2D7', -w / 2 + 0.12, 0.55, 0);
+      }
+    },
+    lamp: {
+      n: 'Lampu Lantai', w: 0.4, d: 0.4, c: '#FFE3A8', nd: 1,
+      f: (g, w, d, c) => {
+        cyl(g, 0.15, 0.15, 0.03, '#2B2F36', 0, 0, 0);
+        cyl(g, 0.012, 0.012, 1.45, '#2B2F36', 0, 0.03, 0);
+        cyl(g, 0.12, 0.2, 0.3, c, 0, 1.35, 0, { emissive: new T.Color(c), emissiveIntensity: 0.35, side: T.DoubleSide });
+      }
+    },
     label: { n: 'Label', w: 1.4, d: 0.5, c: '#334155', label: 1 }
   };
 
   const KINDS = [
     'wall', 'sofa', 'bed', 'nakas', 'wardrobe', 'table', 'coffee', 'chair', 'desk', 'tv',
-    'kitchen', 'fridge', 'toilet', 'sink', 'shower', 'plant', 'rug', 'stairs', 'label'
+    'kitchen', 'fridge', 'toilet', 'sink', 'shower', 'plant', 'rug', 'stairs', 'label',
+    'door', 'window', 'armchair', 'bookcase', 'dresser', 'island', 'stove', 'round', 'stool', 'bathtub', 'lamp'
   ];
 
   function makeItem(it) {
@@ -1851,6 +1941,15 @@
     panel.className = 'sim-edit';
     panel.style.display = 'none';
     el.appendChild(panel);
+ 
+    const mq = window.matchMedia ? window.matchMedia('(max-width:700px)') : null;
+    const placePanel = () => {
+      if (!el.isConnected) return;
+      const slot = el.parentNode && el.parentNode.querySelector('#simo');
+      if (mq && mq.matches && slot) slot.appendChild(panel); else el.appendChild(panel);
+    };
+    placePanel();
+    if (mq) (mq.addEventListener ? mq.addEventListener('change', placePanel) : mq.addListener(placePanel));
 
     const escapeHtml = s =>
       String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -1940,7 +2039,22 @@
 
       const it = findSelected();
       const c = it && CAT[it.t];
-      const addButtons = KINDS.map(k => '<button type="button" data-add="' + k + '">+ ' + CAT[k].n + '</button>').join('');
+      const GRP = [
+        ['Struktur', ['wall', 'door', 'window', 'stairs']],
+        ['Ruang tamu', ['sofa', 'armchair', 'coffee', 'tv', 'bookcase', 'rug']],
+        ['Kamar tidur', ['bed', 'nakas', 'wardrobe', 'dresser']],
+        ['Dapur & makan', ['kitchen', 'island', 'stove', 'fridge', 'table', 'round', 'chair', 'stool']],
+        ['Kamar mandi', ['toilet', 'sink', 'shower', 'bathtub']],
+        ['Dekor & kerja', ['desk', 'lamp', 'plant', 'label']]
+      ];
+      const seenK = {};
+      GRP.forEach(g => g[1].forEach(k => { seenK[k] = 1; }));
+      const extraK = KINDS.filter(k => !seenK[k]);
+      const addButtons = GRP.concat(extraK.length ? [['Lainnya', extraK]] : []).map(g =>
+        '<span class="se-grp"><em>' + g[0] + '</em>' +
+        g[1].filter(k => CAT[k]).map(k => '<button type="button" data-add="' + k + '">+ ' + CAT[k].n + '</button>').join('') +
+        '</span>'
+      ).join('');
 
       let props = '';
       if (it) {
