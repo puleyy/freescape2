@@ -1,4 +1,4 @@
-    const $  = (sel, root = document) => root.querySelector(sel);
+const $  = (sel, root = document) => root.querySelector(sel);
     const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
     const rp = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
     const arrow = text => `${text} <span class="ar">→</span>`;
@@ -18,7 +18,6 @@
       t.classList.add('v');
       setTimeout(() => t.classList.remove('v'), 2600);
     };
-
     const API_BASE = (location.protocol === 'file:' || location.port === '5500')
       ? 'http://localhost/freespace/api/'
       : 'api/';
@@ -68,18 +67,33 @@
           const m = ST('fss') || {};
           m[b.id] = sig;
           ST('fss', m);
+          delete percobaan[b.id];
         })
         .catch(err => {
-          console.error('[Freespace] Gagal menyimpan pesanan ke database:', err);
-          toast('Pesanan belum tersimpan ke database, akan dicoba lagi');
+          console.warn('[Freespace] Pesanan belum masuk database, dicoba ulang otomatis:', err);
+          jadwalUlang(b.id);
         })
         .finally(() => inflight.delete(b.id));
+    };
+
+    const percobaan = {};
+    const jadwalUlang = id => {
+      percobaan[id] = (percobaan[id] || 0) + 1;
+      const tunda = Math.min(3000 * Math.pow(2, percobaan[id] - 1), 60000);
+      setTimeout(() => {
+        const b = (ST('fsb') || {})[id];
+        if (b) syncB(b);
+      }, tunda);
     };
 
     const syncSemuaB = () => {
       const all = ST('fsb') || {};
       Object.keys(all).forEach(id => syncB(all[id]));
     };
+
+    window.addEventListener('online', () => syncSemuaB());
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) syncSemuaB(); });
+    setInterval(() => syncSemuaB(), 30000);
 
     const syncKonsultasi = (d, r) => {
       kirimApi('konsultasi_simpan.php', {
@@ -1660,7 +1674,7 @@ const IM = (i, src) => `
       }));
     }
       const MUZQY_WA = '62895331504721';
-      const MUZQY_TAMPIL = '0895331504721';
+      const MUZQY_TAMPIL = '0895-3315-04721';
       const waKs = txt => `https://wa.me/${MUZQY_WA}?text=${encodeURIComponent(txt)}`;  
 
     const KS_MKT = [
