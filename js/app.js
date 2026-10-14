@@ -19,6 +19,77 @@
       setTimeout(() => t.classList.remove('v'), 2600);
     };
 
+    const API_BASE = (location.protocol === 'file:' || location.port === '5500')
+      ? 'http://localhost/freespace/api/'
+      : 'api/';
+
+    const kirimApi = (file, body) =>
+      fetch(API_BASE + file, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+        .then(r => r.text().then(t => {
+          let j;
+          try { j = JSON.parse(t); } catch (e) { throw new Error('Respons server bukan JSON (cek Apache/PHP): ' + t.slice(0, 120)); }
+          if (!j.ok) throw new Error(j.error || 'Server menolak data');
+          return j;
+        }));
+
+    const sigB = b => (b.paidAt || 0) + '-' + (b.doneAt || 0);
+    const inflight = new Set();
+
+    const syncB = (b, force) => {
+      if (!b || !b.id) return;
+      const done = ST('fss') || {};
+      if (!force && done[b.id] === sigB(b)) return;
+      if (inflight.has(b.id)) return;
+      inflight.add(b.id);
+
+      const loc = b.loc || '';
+      const lokasiTipe = b.a7 || (/^Lokasi proyek/.test(loc) ? 'proyek' : /^Online/.test(loc) ? 'online' : 'studio');
+      const k = b.concept;
+      const sig = sigB(b);
+      const body = {
+        id: b.id,
+        layanan: b.a1, tanggal: b.a2, jam: b.a3,
+        lokasi_tipe: lokasiTipe,
+        alamat_proyek: b.a8 || (lokasiTipe == 'proyek' ? loc.replace(/^Lokasi proyek:\s*/, '') : ''),
+        nama: b.a4, email: b.a5, whatsapp: b.a6,
+        biaya: b.fee,
+        dibuat_ms: b.created, kedaluwarsa_ms: b.exp,
+        dibayar_ms: b.paidAt, selesai_ms: b.doneAt,
+        metode: b.method, pengirim: b.payer,
+        bukti: b.paidAt ? b.proof : undefined,
+        konsep: k ? { sumber: k.sim, judul: k.label, layanan: k.svc, rincian: k.rows, total: k.total } : null
+      };
+      kirimApi('booking_simpan.php', body)
+        .then(() => {
+          const m = ST('fss') || {};
+          m[b.id] = sig;
+          ST('fss', m);
+        })
+        .catch(err => {
+          console.error('[Freespace] Gagal menyimpan pesanan ke database:', err);
+          toast('Pesanan belum tersimpan ke database, akan dicoba lagi');
+        })
+        .finally(() => inflight.delete(b.id));
+    };
+
+    const syncSemuaB = () => {
+      const all = ST('fsb') || {};
+      Object.keys(all).forEach(id => syncB(all[id]));
+    };
+
+    const syncKonsultasi = (d, r) => {
+      kirimApi('konsultasi_simpan.php', {
+        tipe_hasil: r.arch.n,
+        jawaban: d,
+        estimasi_min: r.lo,
+        estimasi_maks: r.hi
+      }).catch(err => console.error('[Freespace] Gagal menyimpan hasil konsultasi:', err));
+    };
+
    const SV = [
   ['desain-3d-interior', 'Desain 3D Interior', 80000, 'Interior', '◧',
     'Visualisasi 3D interior realistis dengan material dan pencahayaan sesuai konsep Anda.',
@@ -617,7 +688,7 @@ const IM = (i, src) => `
     };
 
     const getB = id => (ST('fsb') || {})[id];
-    const saveB = b => { const all = ST('fsb') || {}; all[b.id] = b; ST('fsb', all); ST('fsl', b.id); };
+    const saveB = b => { const all = ST('fsb') || {}; all[b.id] = b; ST('fsb', all); ST('fsl', b.id); syncB(b); };
     const STUDIO = 'Studio Freespace, Jl. Jakarta No. 42, Antapani, Kota Bandung';
     const locOf = d => d.a7 == 'proyek' ? 'Lokasi proyek: ' + (d.a8 || '-') : d.a7 == 'online' ? 'Online (link Zoom/Meet dikirim via WhatsApp & email)' : STUDIO;
     const fdate = (d, opt) => new Date(d).toLocaleString('id-ID', opt);
@@ -967,7 +1038,7 @@ const IM = (i, src) => `
         if (d.id) return;
         const now = Date.now();
         d.id = 'FS-' + Math.random().toString(36).slice(2, 8).toUpperCase();
-        saveB({ id: d.id, a1: d.a1, a2: d.a2, a3: d.a3, a4: d.a4, a5: d.a5, a6: d.a6, loc: locOf(d), fee: BOOKING_FEE, concept: concept || null, created: now, exp: Math.min(now + PAY_HOURS * 3600000, new Date(`${d.a2}T${d.a3}:00`).getTime()), paidAt: null, doneAt: null, method: null });
+        saveB({ id: d.id, a1: d.a1, a2: d.a2, a3: d.a3, a4: d.a4, a5: d.a5, a6: d.a6, a7: d.a7, a8: d.a8, loc: locOf(d), fee: BOOKING_FEE, concept: concept || null, created: now, exp: Math.min(now + PAY_HOURS * 3600000, new Date(`${d.a2}T${d.a3}:00`).getTime()), paidAt: null, doneAt: null, method: null });
         toast('Reservasi dibuat. Silakan lakukan pembayaran');
       });
     }
@@ -1006,6 +1077,7 @@ const IM = (i, src) => `
         const b = getB(id);
         if (!b) { lk.style.display = ''; $('#be').textContent = 'Booking ID tidak ditemukan'; out.innerHTML = ''; return; }
         ST('fsl', id);
+        syncB(b);
 
         const now = Date.now();
         const sched = new Date(`${b.a2}T${b.a3}:00`).getTime();
@@ -1588,7 +1660,7 @@ const IM = (i, src) => `
       }));
     }
       const MUZQY_WA = '62895331504721';
-      const MUZQY_TAMPIL = '0895-3315-04721';
+      const MUZQY_TAMPIL = '0895331504721';
       const waKs = txt => `https://wa.me/${MUZQY_WA}?text=${encodeURIComponent(txt)}`;  
 
     const KS_MKT = [
@@ -2368,6 +2440,7 @@ const IM = (i, src) => `
       form($('#kf'), steps.map(st => Object.assign({}, st, { h: d => { KRES.d = d; return st.h(d); } })), d => {
         KRES = { d, r: kCompute(d) };
         ST('fsk', { tipe: KRES.r.arch.n, waktu: Date.now() });
+        syncKonsultasi(d, KRES.r);
         toast('Analisis selesai');
       });
 
@@ -2402,6 +2475,7 @@ const IM = (i, src) => `
     ];
 
     route();
+    syncSemuaB();
 
 document.addEventListener('pointerdown', e => {
   const btn = e.target.closest && e.target.closest('.acts .btn');
