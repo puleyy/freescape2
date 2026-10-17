@@ -366,14 +366,16 @@ const IM = (i, src) => `
             <div>
               <small class="mu rvl" style="letter-spacing:.14em;font-weight:700">ABOUT US</small>
               <h2 class="rvl" style="margin-top:6px">Kontraktor Arsitek &amp; Bangunan yang Mengeksekusi Langsung di Lapangan</h2>
-              <p class="mu rvl" style="margin-top:14px">
+              <div class="card ab-card ab-text rvl" style="margin-top:14px">
+              <p class="ab-p">
                 PT FREESPACE berbasis di Bandung. Kami bukan sekadar studio desain, melainkan kontraktor yang
                 merencanakan sekaligus membangun: dari desain 3D, gambar kerja, struktur, dan RAB, sampai eksekusi
                 pembangunan dan serah terima.
               </p>
-              <p class="mu rvl" style="margin-top:10px">
+              <p class="ab-p" style="margin-top:10px">
                 Satu tim dari konsep hingga bangunan jadi, sehingga desain, biaya, dan hasil di lapangan tetap selaras.
               </p>
+              </div>
               <div class="acts rvl" style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap">
                 <a class="btn" href="#/layanan/${KONTR[0]}">${arrow('Layanan Kontraktor')}</a>
                 <a class="btn l" href="#/portfolio">Lihat Portofolio</a>
@@ -382,7 +384,7 @@ const IM = (i, src) => `
             <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
               ${[['Perencana', 'Desain, struktur, RAB, dan dokumen PBG'], ['Pelaksana', 'Eksekusi bangunan oleh tim lapangan'],
                  ['Pengawas', 'Kontrol mutu, biaya, dan jadwal'], ['Serah Terima', 'Bangunan jadi, siap huni atau usaha']].map((a, i) => `
-                <div class="card rvl" style="transition-delay:${i * 70}ms">
+                <div class="card ab-card rvl" style="transition-delay:${i * 70}ms">
                   <h3>${a[0]}</h3>
                   <p class="mu" style="margin-top:6px">${a[1]}</p>
                 </div>`).join('')}
