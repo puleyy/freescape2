@@ -333,6 +333,9 @@ const IM = (i, src) => `
           <div class="hov"></div>
           <div id="glow"></div>
           <div class="w"><div class="hcard">
+            <picture class="hlogo">
+              <img src="images/logo-hero.png" alt="Freespace Building" width="383" height="320">
+            </picture>
             <h1>
               <span class="rv"><span>BUILD </span></span>
               <span class="rv"><span>YOUR SPACE.</span></span>

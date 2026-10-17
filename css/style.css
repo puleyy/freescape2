@@ -1,4 +1,4 @@
-    :root {
+:root {
       --bg: #F2F8FF;
       --bgg: linear-gradient(170deg, #FFFFFF 0%, #EAF4FF 28%, #CDE5FF 62%, #A6D2FF 100%);
       --bg2: #DCEBFF;
@@ -1816,3 +1816,14 @@ html::before {
 
 .chip { background: var(--gb) !important; color: var(--bl) !important; border: 1px solid #2F8CFF !important; }
 .chip.on { background: linear-gradient(110deg, #B9C3D8 0%, #8FB5EC 55%, #5CA8FF 100%) !important; color: #0F4A9A !important; font-weight: 700; }
+
+.hero.home .hcard .hlogo { display: block; margin: 0 0 22px; }
+.hero.home .hcard .hlogo img {
+  display: block; width: clamp(150px, 16vw, 230px); height: auto;
+  filter: drop-shadow(0 2px 6px rgba(6, 40, 100, .45));
+}
+@media (max-width: 900px) {
+  .hero.home .hcard .hlogo { margin-bottom: 14px; }
+  .hero.home { min-height: 440px !important; }
+  .hero.home .hcard .hlogo img { width: 96px; }
+}
